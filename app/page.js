@@ -150,7 +150,7 @@ const Page = () => {
 								className="rounded-lg w-full h-full object-cover sm:max-w-sm md:max-w-xl lg:max-w-2xl"
 							/>
 							{isCounting && (
-								<div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 z-20">
+								<div className="absolute inset-0 flex items-center justify-center z-20">
 									<span className="text-white text-6xl font-bold">{count}</span>
 								</div>
 							)}
