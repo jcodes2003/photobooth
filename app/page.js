@@ -1,103 +1,157 @@
-import Image from "next/image";
+'use client';
+import React, { useRef, useCallback, useState } from "react";
+import { FaHeart } from "react-icons/fa6";
+import Webcam from "react-webcam";
+import "./globals.css";
+import Background from "./component/Background";
+import CameraControls from "./component/CameraControls";
+import LayoutSelector from "./component/LayoutSelector";
+import LayoutWithImages from "./component/LayoutWithImages";
+import html2canvas from "html2canvas";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+const layouts = [
+	{ label: "2x2 Grid", value: "grid" },
+	{ label: "Horizontal Row", value: "row" },
+	{ label: "Vertical Column", value: "column" },
+	{ label: "Single Large Image", value: "single" },
+];
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
-}
+const cameraFrameClass =
+	"relative flex items-center justify-center bg-white rounded-xl shadow-lg border-4 border-pink-300 overflow-hidden";
+const heartClass =
+	"absolute text-pink-400 drop-shadow-lg z-10";
+
+const Page = () => {
+	const webcamRef = useRef(null);
+	const layoutRef = useRef(null);
+	const [selectedLayout, setSelectedLayout] = useState(layouts[0].value);
+	const [capturedImages, setCapturedImages] = useState([
+		null, null, null, null
+	]); // for up to 4 images
+
+	const handleUserMediaError = useCallback((err) => {
+		alert("Camera access denied or not available.");
+		console.error(err);
+	}, []);
+
+	const handleTakePhoto = () => {
+		if (webcamRef.current) {
+			const imageSrc = webcamRef.current.getScreenshot();
+			// Find first empty slot, or replace the last one if all are filled
+			const idx = capturedImages.findIndex((img) => img === null);
+			if (idx !== -1) {
+				const newImages = [...capturedImages];
+				newImages[idx] = imageSrc;
+				setCapturedImages(newImages);
+			} else {
+				// Replace the last image if all slots are filled
+				const newImages = [...capturedImages.slice(1), imageSrc];
+				setCapturedImages(newImages);
+			}
+		}
+	};
+
+	const handleClearAll = () => setCapturedImages([null, null, null, null]);
+
+	const handleSaveLayout = async () => {
+		if (layoutRef.current) {
+			const canvas = await html2canvas(layoutRef.current, { useCORS: true });
+			const dataUrl = canvas.toDataURL("image/png");
+			const link = document.createElement("a");
+			link.href = dataUrl;
+			link.download = "photobooth-layout.png";
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		}
+	};
+
+	const currentLayout = layouts.find((l) => l.value === selectedLayout);
+
+	return (
+		<Background>
+			<div className="flex flex-col items-center justify-center min-h-screen px-2">
+				<h1 className="text-3xl md:text-5xl flex items-center gap-2 font-pacifico mb-10 text-center w-full justify-center"
+					style={{ fontFamily: "'Pacifico', cursive" }}>
+					Photo Booth <FaHeart color="red" />
+				</h1>
+				<div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-12 w-full max-w-7xl">
+					{/* Camera and controls */}
+					<div className="flex flex-col items-center w-full md:w-auto">
+						{/* Camera box with only the live camera view */}
+						<div className={cameraFrameClass + " w-full max-w-xs sm:max-w-sm md:max-w-lg lg:max-w-2xl aspect-video lg:mb-8"}>
+							<Webcam
+								audio={false}
+								ref={webcamRef}
+								height={220}
+								width={320}
+								onUserMediaError={handleUserMediaError}
+								screenshotFormat="image/jpeg"
+								videoConstraints={{
+									width: 1280,
+									height: 720,
+									facingMode: "user",
+								}}
+								className="rounded-lg w-full h-full object-cover"
+							/>
+						</div>
+						<CameraControls
+							handleTakePhoto={handleTakePhoto}
+							handleClearAll={handleClearAll}
+						/>
+						{/* Save Image Button */}
+						{capturedImages.some(img => img) && (
+							<button
+								className="bg-green-500 text-white py-2 px-4 rounded mt-2 w-full max-w-xs sm:max-w-sm"
+								onClick={() => {
+									// Find the last non-null image
+									const lastImg = [...capturedImages].reverse().find(img => img);
+									if (lastImg) {
+										const link = document.createElement('a');
+										link.href = lastImg;
+										link.download = 'photobooth.jpg';
+										document.body.appendChild(link);
+										link.click();
+										document.body.removeChild(link);
+									}
+								}}
+							>
+								Save Last Photo
+							</button>
+						)}
+						<button
+							className="bg-purple-500 text-white py-2 px-4 rounded mt-2 w-full max-w-xs sm:max-w-sm"
+							onClick={handleSaveLayout}
+						>
+							Save Layout as Image
+						</button>
+						<LayoutSelector
+							layouts={layouts}
+							selectedLayout={selectedLayout}
+							setSelectedLayout={setSelectedLayout}
+						/>
+					</div>
+					{/* Layout beside or below camera */}
+					<div
+						ref={layoutRef}
+						className="flex flex-col items-center w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-xl"
+						style={{ width: '640px', maxWidth: '100%' }}
+					>
+						<h2 className="text-lg md:text-2xl font-semibold mb-4 text-center w-full">
+						</h2>
+						<div className="w-full flex justify-center">
+							<div className="w-full">
+								<LayoutWithImages
+									selectedLayout={selectedLayout}
+									capturedImages={capturedImages}
+								/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</Background>
+	);
+};
+
+export default Page;
