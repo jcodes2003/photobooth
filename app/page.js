@@ -127,27 +127,27 @@ const Page = () => {
 	return (
 		<Background>
 			<div className="flex flex-col min-h-screen px-2">
-				<h1 className="text-3xl md:text-5xl flex items-center gap-2 font-pacifico mb-10 text-center w-full justify-center text-black sticky top-0 z-30 bg-transparent">
+				<h1 className="text-3xl md:text-5xl flex items-center gap-2 font-pacifico mb-10 text-center w-full justify-center text-black top-0 z-30 bg-transparent">
 					Photo Booth <FaHeart color="red" />
 				</h1>
 				<div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-12 w-full max-w-7xl mx-auto flex-1">
 					{/* Camera and controls */}
 					<div className="flex flex-col items-center w-full md:w-auto">
 						{/* Camera box with only the live camera view */}
-						<div className={cameraFrameClass + " w-full max-w-xs sm:max-w-sm md:max-w-xl lg:max-w-2xl aspect-video lg:mb-8"}>
+						<div className={cameraFrameClass + " w-full max-w-md sm:max-w-xl md:max-w-3xl lg:max-w-5xl xl:max-w-7xl aspect-video lg:mb-8"}>
 							<Webcam
 								audio={false}
 								ref={webcamRef}
-								height={480} // bigger for web
-								width={720}  // bigger for web
+								height={900} // much bigger for web
+								width={1600}  // much bigger for web
 								onUserMediaError={handleUserMediaError}
 								screenshotFormat="image/jpeg"
 								videoConstraints={{
-									width: 720,
-									height: 480,
+									width: 1600,
+									height: 900,
 									facingMode: "user",
 								}}
-								className="rounded-lg w-full h-full object-cover sm:max-w-sm md:max-w-xl lg:max-w-2xl"
+								className="rounded-lg w-full h-full object-cover sm:max-w-xl md:max-w-3xl lg:max-w-5xl xl:max-w-7xl"
 							/>
 							{isCounting && (
 								<div className="absolute inset-0 flex items-center justify-center z-20">
