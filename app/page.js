@@ -154,8 +154,12 @@ const Page = () => {
 					{/* Layout beside or below camera */}
 					<div
 						ref={layoutRef}
-						className="flex flex-col items-center"
-						style={{ width: '900px' }}
+						className="flex flex-col items-center overflow-x-auto"
+						style={{
+							minWidth: '320px', // minimum for mobile
+							width: '100vw', // full width on mobile
+							maxWidth: '900px', // max for desktop
+						}}
 					>
 						<h2 className="text-lg md:text-2xl font-semibold mb-4 text-center w-full">
 						</h2>
