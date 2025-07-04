@@ -69,13 +69,36 @@ const Page = () => {
 
 	const handleSaveLayout = async () => {
 		if (layoutRef.current) {
-			// Save current width style
 			const prevWidth = layoutRef.current.style.width;
-			// Set fixed width for capture
-			layoutRef.current.style.width = '900px';
+			const prevDisplay = layoutRef.current.style.display;
+			const prevJustify = layoutRef.current.style.justifyContent;
+			const prevAlign = layoutRef.current.style.alignItems;
+			const prevPadding = layoutRef.current.style.padding;
+
+			if (selectedLayout === 'row') {
+				// Always reserve space for 4 images (even if some are null)
+				const imgSize = 220; // px, adjust to match your image/card size
+				const gap = 24; // px, adjust to match your gap-6
+				const count = 4;
+				const totalWidth = count * imgSize + (count - 1) * gap;
+				layoutRef.current.style.width = totalWidth + 'px';
+				layoutRef.current.style.display = 'flex';
+				layoutRef.current.style.justifyContent = 'flex-start';
+				layoutRef.current.style.alignItems = 'center';
+				layoutRef.current.style.padding = '0';
+			} else {
+				layoutRef.current.style.width = '900px';
+			}
+
 			const canvas = await html2canvas(layoutRef.current, { useCORS: true });
-			// Restore previous width
+
+			// Restore previous styles
 			layoutRef.current.style.width = prevWidth;
+			layoutRef.current.style.display = prevDisplay;
+			layoutRef.current.style.justifyContent = prevJustify;
+			layoutRef.current.style.alignItems = prevAlign;
+			layoutRef.current.style.padding = prevPadding;
+
 			const dataUrl = canvas.toDataURL("image/png");
 			const link = document.createElement("a");
 			link.href = dataUrl;
@@ -86,16 +109,28 @@ const Page = () => {
 		}
 	};
 
+	const handleSaveAllPhotos = () => {
+		capturedImages.forEach((img, idx) => {
+			if (img) {
+				const link = document.createElement('a');
+				link.href = img;
+				link.download = `photobooth-photo-${idx + 1}.jpg`;
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+			}
+		});
+	};
+
 	const currentLayout = layouts.find((l) => l.value === selectedLayout);
 
 	return (
 		<Background>
-			<div className="flex flex-col items-center justify-center min-h-screen px-2">
-				<h1 className="text-3xl md:text-5xl flex items-center gap-2 font-pacifico mb-10 text-center w-full justify-center"
-					>
+			<div className="flex flex-col min-h-screen px-2">
+				<h1 className="text-3xl md:text-5xl flex items-center gap-2 font-pacifico mb-10 text-center w-full justify-center text-black sticky top-0 z-30 bg-transparent">
 					Photo Booth <FaHeart color="red" />
 				</h1>
-				<div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-12 w-full max-w-7xl">
+				<div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-12 w-full max-w-7xl mx-auto flex-1">
 					{/* Camera and controls */}
 					<div className="flex flex-col items-center w-full md:w-auto">
 						{/* Camera box with only the live camera view */}
@@ -115,7 +150,7 @@ const Page = () => {
 								className="rounded-lg w-full h-full object-cover sm:max-w-sm md:max-w-xl lg:max-w-2xl"
 							/>
 							{isCounting && (
-								<div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 z-20">
+								<div className="absolute inset-0 flex items-center justify-center z-20">
 									<span className="text-white text-6xl font-bold">{count}</span>
 								</div>
 							)}
@@ -156,6 +191,15 @@ const Page = () => {
 							selectedLayout={selectedLayout}
 							setSelectedLayout={setSelectedLayout}
 						/>
+						{/* Save All Photos Button */}
+						{capturedImages.some(img => img) && (
+							<button
+								className="bg-blue-500 text-white py-2 px-4 rounded mt-2 w-full max-w-xs sm:max-w-sm"
+								onClick={handleSaveAllPhotos}
+							>
+								Save All Photos
+							</button>
+						)}
 					</div>
 					{/* Layout beside or below camera */}
 					<div
