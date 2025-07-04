@@ -61,7 +61,7 @@ const LayoutWithImages = ({ selectedLayout, capturedImages }) => {
         <div className="w-full overflow-x-auto">
           <div className="flex flex-row gap-4 w-max px-2">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="h-40 w-40 min-w-40">
+              <div key={i} className="h-30 w-36 min-w-30">
                 {renderSlot(capturedImages[i], i)}
               </div>
             ))}

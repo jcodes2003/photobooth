@@ -28,6 +28,8 @@ const Page = () => {
 	const [capturedImages, setCapturedImages] = useState([
 		null, null, null, null
 	]); // for up to 4 images
+	const [isCounting, setIsCounting] = useState(false);
+	const [count, setCount] = useState(0);
 
 	const handleUserMediaError = useCallback((err) => {
 		alert("Camera access denied or not available.");
@@ -35,20 +37,32 @@ const Page = () => {
 	}, []);
 
 	const handleTakePhoto = () => {
-		if (webcamRef.current) {
-			const imageSrc = webcamRef.current.getScreenshot();
-			// Find first empty slot, or replace the last one if all are filled
-			const idx = capturedImages.findIndex((img) => img === null);
-			if (idx !== -1) {
-				const newImages = [...capturedImages];
-				newImages[idx] = imageSrc;
-				setCapturedImages(newImages);
-			} else {
-				// Replace the last image if all slots are filled
-				const newImages = [...capturedImages.slice(1), imageSrc];
-				setCapturedImages(newImages);
+		if (isCounting) return; // Prevent double click
+		setIsCounting(true);
+		setCount(5);
+		let timer = 5;
+		const interval = setInterval(() => {
+			timer--;
+			setCount(timer);
+			if (timer === 0) {
+				clearInterval(interval);
+				setIsCounting(false);
+				if (webcamRef.current) {
+					const imageSrc = webcamRef.current.getScreenshot();
+					// Find first empty slot, or replace the last one if all are filled
+					const idx = capturedImages.findIndex((img) => img === null);
+					if (idx !== -1) {
+						const newImages = [...capturedImages];
+						newImages[idx] = imageSrc;
+						setCapturedImages(newImages);
+					} else {
+						// Replace the last image if all slots are filled
+						const newImages = [...capturedImages.slice(1), imageSrc];
+						setCapturedImages(newImages);
+					}
+				}
 			}
-		}
+		}, 1000);
 	};
 
 	const handleClearAll = () => setCapturedImages([null, null, null, null]);
@@ -94,10 +108,16 @@ const Page = () => {
 								}}
 								className="rounded-lg w-full h-full object-cover sm:max-w-sm md:max-w-lg lg:max-w-2xl"
 							/>
+							{isCounting && (
+								<div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 z-20">
+									<span className="text-white text-6xl font-bold">{count}</span>
+								</div>
+							)}
 						</div>
 						<CameraControls
 							handleTakePhoto={handleTakePhoto}
 							handleClearAll={handleClearAll}
+							isCounting={isCounting}
 						/>
 						{/* Save Image Button */}
 						{capturedImages.some(img => img) && (
