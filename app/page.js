@@ -90,7 +90,7 @@ const Page = () => {
 	return (
 		<Background>
 			<div className="flex flex-col items-center justify-center min-h-screen px-2">
-				<h1 className="text-3xl md:text-5xl flex items-center gap-2 font-pacifico mb-10 text-center w-full justify-center"
+				<h1 className="text-3xl md:text-5xl flex items-center gap-2 font-pacifico mb-10 text-center w-full justify-center text-black"
 					>
 					Photo Booth <FaHeart color="red" />
 				</h1>
@@ -158,21 +158,20 @@ const Page = () => {
 					</div>
 					{/* Layout beside or below camera */}
 					<div
-						ref={layoutRef}
-						className="flex flex-col items-center overflow-x-auto"
-						style={{ minWidth: '320px', width: '100%', maxWidth: '900px' }}
-					>
-						<h2 className="text-lg md:text-2xl font-semibold mb-4 text-center w-full">
-						</h2>
-						<div className="w-full flex justify-center">
-							<div className="w-full">
-								<LayoutWithImages
-									selectedLayout={selectedLayout}
-									capturedImages={capturedImages}
-								/>
-							</div>
-						</div>
-					</div>
+	ref={layoutRef}
+	className="flex flex-col items-center overflow-x-auto w-full max-w-full md:max-w-[900px]"
+	style={{ minWidth: '0', width: '100%' }}
+>
+	<h2 className="text-lg md:text-2xl font-semibold mb-4 text-center w-full"></h2>
+	<div className="w-full flex justify-center">
+		<div className={selectedLayout === 'row' ? 'w-full flex justify-center' : 'w-full'}>
+			<LayoutWithImages
+				selectedLayout={selectedLayout}
+				capturedImages={capturedImages}
+			/>
+		</div>
+	</div>
+</div>
 				</div>
 			</div>
 		</Background>
