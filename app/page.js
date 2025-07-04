@@ -150,7 +150,7 @@ const Page = () => {
 								className="rounded-lg w-full h-full object-cover sm:max-w-sm md:max-w-xl lg:max-w-2xl"
 							/>
 							{isCounting && (
-								<div className="absolute inset-0 flex items-center justify-center z-20">
+								<div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 z-20">
 									<span className="text-white text-6xl font-bold">{count}</span>
 								</div>
 							)}
@@ -161,7 +161,7 @@ const Page = () => {
 							isCounting={isCounting}
 						/>
 						{/* Save Image Button */}
-						{capturedImages.some(img => img) && (
+						{/* {capturedImages.some(img => img) && (
 							<button
 								className="bg-green-500 text-white py-2 px-4 rounded mt-2 w-full max-w-xs sm:max-w-sm"
 								onClick={() => {
@@ -179,7 +179,7 @@ const Page = () => {
 							>
 								Save Last Photo
 							</button>
-						)}
+						)} */}
 						<button
 							className="bg-purple-500 text-white py-2 px-4 rounded mt-2 w-full max-w-xs sm:max-w-sm"
 							onClick={handleSaveLayout}
@@ -192,14 +192,14 @@ const Page = () => {
 							setSelectedLayout={setSelectedLayout}
 						/>
 						{/* Save All Photos Button */}
-						{capturedImages.some(img => img) && (
+						{/* {capturedImages.some(img => img) && (
 							<button
 								className="bg-blue-500 text-white py-2 px-4 rounded mt-2 w-full max-w-xs sm:max-w-sm"
 								onClick={handleSaveAllPhotos}
 							>
 								Save All Photos
 							</button>
-						)}
+						)} */}
 					</div>
 					{/* Layout beside or below camera */}
 					<div
