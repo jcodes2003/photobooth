@@ -69,6 +69,9 @@ const Page = () => {
 
 	const handleSaveLayout = async () => {
 		if (layoutRef.current) {
+			// Store original width style
+			const originalWidth = layoutRef.current.style.width;
+			layoutRef.current.style.width = '900px';
 			const canvas = await html2canvas(layoutRef.current, { useCORS: true });
 			const dataUrl = canvas.toDataURL("image/png");
 			const link = document.createElement("a");
@@ -77,6 +80,8 @@ const Page = () => {
 			document.body.appendChild(link);
 			link.click();
 			document.body.removeChild(link);
+			// Restore original width style
+			layoutRef.current.style.width = originalWidth;
 		}
 	};
 
@@ -155,11 +160,7 @@ const Page = () => {
 					<div
 						ref={layoutRef}
 						className="flex flex-col items-center overflow-x-auto"
-						style={{
-							minWidth: '320px', // minimum for mobile
-							width: '100vw', // full width on mobile
-							maxWidth: '900px', // max for desktop
-						}}
+						style={{ minWidth: '320px', width: '100%', maxWidth: '900px' }}
 					>
 						<h2 className="text-lg md:text-2xl font-semibold mb-4 text-center w-full">
 						</h2>
