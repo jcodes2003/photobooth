@@ -69,10 +69,13 @@ const Page = () => {
 
 	const handleSaveLayout = async () => {
 		if (layoutRef.current) {
-			// Store original width style
-			const originalWidth = layoutRef.current.style.width;
+			// Save current width style
+			const prevWidth = layoutRef.current.style.width;
+			// Set fixed width for capture
 			layoutRef.current.style.width = '900px';
 			const canvas = await html2canvas(layoutRef.current, { useCORS: true });
+			// Restore previous width
+			layoutRef.current.style.width = prevWidth;
 			const dataUrl = canvas.toDataURL("image/png");
 			const link = document.createElement("a");
 			link.href = dataUrl;
@@ -80,8 +83,6 @@ const Page = () => {
 			document.body.appendChild(link);
 			link.click();
 			document.body.removeChild(link);
-			// Restore original width style
-			layoutRef.current.style.width = originalWidth;
 		}
 	};
 
@@ -90,7 +91,7 @@ const Page = () => {
 	return (
 		<Background>
 			<div className="flex flex-col items-center justify-center min-h-screen px-2">
-				<h1 className="text-3xl md:text-5xl flex items-center gap-2 font-pacifico mb-10 text-center w-full justify-center text-black"
+				<h1 className="text-3xl md:text-5xl flex items-center gap-2 font-pacifico mb-10 text-center w-full justify-center"
 					>
 					Photo Booth <FaHeart color="red" />
 				</h1>
@@ -98,20 +99,20 @@ const Page = () => {
 					{/* Camera and controls */}
 					<div className="flex flex-col items-center w-full md:w-auto">
 						{/* Camera box with only the live camera view */}
-						<div className={cameraFrameClass + " w-full max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-3xl aspect-video lg:mb-8"}>
+						<div className={cameraFrameClass + " w-full max-w-xs sm:max-w-sm md:max-w-xl lg:max-w-2xl aspect-video lg:mb-8"}>
 							<Webcam
 								audio={false}
 								ref={webcamRef}
-								height={600} // bigger for web
-								width={1000}  // bigger for web
+								height={480} // bigger for web
+								width={720}  // bigger for web
 								onUserMediaError={handleUserMediaError}
 								screenshotFormat="image/jpeg"
 								videoConstraints={{
-									width: 1000,
-									height: 600,
+									width: 720,
+									height: 480,
 									facingMode: "user",
 								}}
-								className="rounded-lg w-full h-full object-cover sm:max-w-md md:max-w-2xl lg:max-w-3xl"
+								className="rounded-lg w-full h-full object-cover sm:max-w-sm md:max-w-xl lg:max-w-2xl"
 							/>
 							{isCounting && (
 								<div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 z-20">
@@ -158,20 +159,21 @@ const Page = () => {
 					</div>
 					{/* Layout beside or below camera */}
 					<div
-	ref={layoutRef}
-	className="flex flex-col items-center overflow-x-auto w-full max-w-full md:max-w-[900px]"
-	style={{ minWidth: '0', width: '100%' }}
->
-	<h2 className="text-lg md:text-2xl font-semibold mb-4 text-center w-full"></h2>
-	<div className="w-full flex justify-center">
-		<div className={selectedLayout === 'row' ? 'w-full flex justify-center' : 'w-full'}>
-			<LayoutWithImages
-				selectedLayout={selectedLayout}
-				capturedImages={capturedImages}
-			/>
-		</div>
-	</div>
-</div>
+						ref={layoutRef}
+						className="flex flex-col items-center overflow-x-auto"
+						style={{ minWidth: '320px', width: '100%', maxWidth: '900px' }}
+					>
+						<h2 className="text-lg md:text-2xl font-semibold mb-4 text-center w-full">
+						</h2>
+						<div className="w-full flex justify-center">
+							<div className="w-full">
+								<LayoutWithImages
+									selectedLayout={selectedLayout}
+									capturedImages={capturedImages}
+								/>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</Background>
