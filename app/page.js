@@ -83,16 +83,16 @@ const Page = () => {
 							<Webcam
 								audio={false}
 								ref={webcamRef}
-								height={220}
-								width={320}
+								height={340} // increased height for mobile
+								width={400}  // increased width for mobile
 								onUserMediaError={handleUserMediaError}
 								screenshotFormat="image/jpeg"
 								videoConstraints={{
-									width: 1280,
-									height: 720,
+									width: 400,
+									height: 340,
 									facingMode: "user",
 								}}
-								className="rounded-lg w-full h-full object-cover"
+								className="rounded-lg w-full h-full object-cover sm:max-w-sm md:max-w-lg lg:max-w-2xl"
 							/>
 						</div>
 						<CameraControls
